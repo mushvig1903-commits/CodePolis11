@@ -17,6 +17,7 @@ public class Lesson2task1 {
         System.out.println("Net Salary: " + netSalary + "AZN");
 
 
+
 //        double grossSalary = 2234;
 //        double taxInterest = 0.14;
 //        double Tax = (int) (grossSalary * taxInterest);

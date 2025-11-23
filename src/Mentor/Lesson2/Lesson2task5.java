@@ -2,7 +2,7 @@ package Mentor.Lesson2;
 
 import java.util.Scanner;
 
-public class Lesson3task4 {
+public class Lesson2task5 {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
         System.out.print("Enter Seconds: " );
