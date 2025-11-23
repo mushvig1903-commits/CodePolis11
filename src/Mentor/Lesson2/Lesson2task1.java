@@ -1,15 +1,14 @@
-package MainLesson1.Main;
+package Mentor.Lesson2;
 
 import java.util.Scanner;
-import java.util.zip.ZipEntry;
 
-public class Lesson1 {
+public class Lesson2task1 {
     public static void main(String[] args) {
         System.out.println("Net Salary Calculator");
         Scanner sc = new Scanner(System.in);
         //Xalis Maaş Hesablayıcısı
         //Net Salary Calculator
-        System.out.print("Enter Gross Salary:");
+        System.out.print("Enter Gross Salary AZN:");
         double gross = sc.nextDouble();
         System.out.print("Enter Tax % :");
         double taxProcent = sc.nextDouble();
