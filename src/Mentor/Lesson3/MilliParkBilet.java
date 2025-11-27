@@ -8,7 +8,7 @@ public class MilliParkBilet {
         // (int olaraq: 1-Hiking, 2-Camping, 3-Biking).
         System.out.println("Milli Parka Xosh Gelmisiz");
         System.out.println("1-Hiking, 2-Camping, 3-Biking");
-        System.out.println("Zehmet olmasa secim edin");
+        System.out.println("Zehmet olmasa secim edin: ");
         int choice = sc.nextInt();
 
         if (choice == 1){
@@ -20,8 +20,14 @@ public class MilliParkBilet {
         } else {
             System.out.println("Duzgun secim etmediniz");
         }
-        System.out.println("Zehmet olmasa marshurut secimi edin");
+        System.out.println("Zehmet olmasa marshurut secimi edin: ");
         System.out.println("1-asan, 2-orta asan, 3-cetin, 4-profesional");
+
+        System.out.println("\nMövcud gəzinti marşrutları:");
+        System.out.println("1 - Meşə yolu");
+        System.out.println("2 - Dağ yolu");
+        System.out.println("3 - Çay kənarı");
+        System.out.println("4 - Göl ətrafı");
         int choice2 = sc.nextInt();
 
         switch (choice2){
