@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valyuta Konverteri</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+        }
+        .converter-app {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Padding-i daxilə daxil etmək */
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #28a745;
+            background-color: #e2f9e6;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .rate-info {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+            border-top: 1px dashed #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="converter-app">
+    <h1>💸 Valyuta Konverteri</h1>
+
+    <label for="amount">Məbləğ:</label>
+    <input type="number" id="amount" value="100" min="0" step="any">
+
+    <label for="currency">Valyuta:</label>
+    <select id="currency">
+        <option value="USD">ABŞ Dolları (USD)</option>
+        <option value="EUR">Avro (EUR)</option>
+    </select>
+
+    <button onclick="convert()">Konvertasiya Et</button>
+
+    <div class="result-box">
+        <p id="result">Məbləği daxil edin və konvertasiya edin.</p>
+    </div>
+
+    <div class="rate-info">
+        <p>Komissiya Dərəcəsi: <span id="commissionRate">1%</span></p>
+        <p>USD → AZN Əmsalı: <span id="usdRate">1.7</span></p>
+        <p>EUR → AZN Əmsalı: <span id="eurRate">1.8</span></p>
+    </div>
+
+</div>
+
+<script>
+    // Java backend-i təqlid edən JavaScript sabitlər və funksiyalar
+    const COMMISSION_RATE = 0.01; // 1%
+    const USD_RATE = 1.7;
+    const EUR_RATE = 1.8;
+
+    // İnformasiyanı HTML-ə daxil etmək
+    document.getElementById('commissionRate').textContent = (COMMISSION_RATE * 100) + '%';
+    document.getElementById('usdRate').textContent = USD_RATE;
+    document.getElementById('eurRate').textContent = EUR_RATE;
+
+    /**
+     * Valyutanı AZN-ə konvertasiya edir (komissiya daxil olmaqla)
+     * @param {number} amount - Konvertasiya ediləcək məbləğ
+     * @param {number} rate - Valyuta mübadilə əmsalı
+     * @returns {number} - Vergi tutulduqdan sonra qaytarılacaq AZN məbləği
+     */
+    function convertToAzn(amount, rate) {
+        if (isNaN(amount) || amount < 0) return 0;
+
+        const azn = amount * rate;
+        const commission = azn * COMMISSION_RATE;
+        // Java kodunda olduğu kimi: azn - komissiya
+        return azn - commission;
+    }
+
+    /**
+     * Konvertasiya prosesini idarə edir və nəticəni göstərir.
+     */
+    function convert() {
+        const amountInput = document.getElementById('amount').value;
+        const currency = document.getElementById('currency').value;
+        const amount = parseFloat(amountInput);
+
+        if (isNaN(amount) || amount <= 0) {
+            document.getElementById('result').textContent = "Zəhmət olmasa, düzgün məbləğ daxil edin.";
+            return;
+        }
+
+        let rate;
+        let currencySymbol;
+
+        if (currency === 'USD') {
+            rate = USD_RATE;
+            currencySymbol = 'USD';
+        } else if (currency === 'EUR') {
+            rate = EUR_RATE;
+            currencySymbol = 'EUR';
+        } else {
+            document.getElementById('result').textContent = "Naməlum valyuta seçimi.";
+            return;
+        }
+
+        const resultAzn = convertToAzn(amount, rate);
+
+        // Nəticəni ekranda göstərmək
+        document.getElementById('result').innerHTML =
+            `**${amount.toFixed(2)} ${currencySymbol}** = **${resultAzn.toFixed(2)} AZN** <br> (Vergi tutulduqdan sonra)`;
+    }
+
+    // Səhifə yüklənən kimi ilkin konvertasiyanı etmək
+    window.onload = convert;
+
+</script>
+
+</body>
+</html>

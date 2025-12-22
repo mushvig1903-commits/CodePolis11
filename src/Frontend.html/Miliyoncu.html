@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <title>Milyonçu - Full UI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --blue-glow: #3498db;
+            --gold: #f1c40f;
+            --dark-blue: #000033;
+            --orange: #e67e22;
+        }
+
+        body {
+            background: radial-gradient(circle, #0a0a4d 0%, #00001a 100%);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Əsas Oyun Sahəsi */
+        .game-wrapper {
+            display: flex;
+            width: 95%;
+            height: 90vh;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .main-game-area {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Sağ tərəfdəki Məbləğ Paneli */
+        .side-panel {
+            flex: 1;
+            background: rgba(0, 0, 51, 0.8);
+            border-left: 3px solid var(--blue-glow);
+            height: 100%;
+            display: flex;
+            flex-direction: column-reverse; /* Aşağıdan yuxarı düzülüş */
+            padding: 20px;
+            justify-content: center;
+        }
+
+        .prize-step {
+            padding: 5px 15px;
+            margin: 2px 0;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--gold);
+            display: flex;
+            justify-content: space-between;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .prize-step.active {
+            background: var(--orange);
+            color: white;
+            box-shadow: 0 0 15px var(--orange);
+        }
+
+        .prize-step.completed { color: white; opacity: 0.6; }
+
+        /* Stil elementləri (əvvəlki kimi) */
+        .header-panel { width: 100%; display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .prize-tag {
+            background: linear-gradient(180deg, #ffd700 0%, #b38f00 100%);
+            padding: 8px 30px; border: 2px solid #fff; color: #000; font-weight: bold;
+            clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+        }
+        .lifeline-group { display: flex; gap: 10px; }
+        .lifeline-icon {
+            width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--blue-glow);
+            background: #050566; color: var(--gold); display: flex; align-items: center;
+            justify-content: center; cursor: pointer; font-size: 20px;
+        }
+        .lifeline-icon.used { opacity: 0.2; filter: grayscale(1); }
+        .center-logo {
+            width: 250px; height: 250px; background: url('logo.png') no-repeat center;
+            background-size: contain; filter: drop-shadow(0 0 20px var(--blue-glow));
+            margin-bottom: 20px;
+        }
+        .question-strip {
+            width: 90%; background: linear-gradient(90deg, transparent 0%, #050566 15%, #050566 85%, transparent 100%);
+            border-top: 2px solid var(--blue-glow); border-bottom: 2px solid var(--blue-glow);
+            padding: 20px; text-align: center; font-size: 22px; margin-bottom: 30px;
+        }
+        .answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 40px; width: 90%; }
+        .answer-btn {
+            background: var(--dark-blue); border: 2px solid var(--blue-glow); padding: 10px 30px;
+            cursor: pointer; font-size: 18px; display: flex; align-items: center;
+            clip-path: polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%);
+        }
+        .answer-btn:hover { background: linear-gradient(180deg, #e67e22 0%, #d35400 100%); }
+        .letter { color: var(--gold); font-weight: bold; margin-right: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="game-wrapper">
+    <div class="main-game-area">
+        <div class="header-panel">
+            <div class="prize-tag" id="prize-display">0 AZN</div>
+            <div class="lifeline-group">
+                <div class="lifeline-icon" id="j50" onclick="useJoker('50')"><i class="fa-solid fa-star-half-stroke"></i></div>
+                <div class="lifeline-icon" id="jDZ" onclick="useJoker('DZ')"><i class="fa-solid fa-phone"></i></div>
+                <div class="lifeline-icon" id="jAK" onclick="useJoker('AK')"><i class="fa-solid fa-users"></i></div>
+            </div>
+        </div>
+
+        <div class="center-logo"></div>
+
+        <div class="question-strip" id="q-text">Yüklənir...</div>
+
+        <div class="answers-grid">
+            <div class="answer-btn" onclick="check(1)"><span class="letter">A:</span> <span id="a1"></span></div>
+            <div class="answer-btn" onclick="check(2)"><span class="letter">B:</span> <span id="a2"></span></div>
+            <div class="answer-btn" onclick="check(3)"><span class="letter">C:</span> <span id="a3"></span></div>
+            <div class="answer-btn" onclick="check(4)"><span class="letter">D:</span> <span id="a4"></span></div>
+        </div>
+    </div>
+
+    <div class="side-panel" id="prize-ladder">
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Atalar sözünü tamamlayın: 'Dama-dama göl olar, axa-axa...'", opts: ["Çay olar", "Yol olar", "Sel olar", "Bənd olar"], correct: 3, award: 100 },
+        { q: "Hansı meyvənin qurusu 'kişmiş' adlanır?", opts: ["Alma", "Üzüm", "Ərik", "Heyva"], correct: 2, award: 200 },
+        { q: "Şahmat taxtasında cəmi neçə xana var?", opts: ["32", "48", "64", "81"], correct: 3, award: 300 },
+        { q: "Azərbaycanın dövlət bayrağındakı yaşıl rəng nəyi təmsil edir?", opts: ["Müasirlik", "Demokratiya", "İslam", "Azadlıq"], correct: 3, award: 500 },
+        { q: "Hansı okean ən böyük sahəyə malikdir?", opts: ["Atlantik", "Hind", "Şimal Buzlu", "Sakit"], correct: 4, award: 1000 },
+        { q: "Azərbaycanın ilk paytaxtı haradır?", opts: ["Bakı", "Şəki", "Gəncə", "Bərdə"], correct: 3, award: 2000 },
+        { q: "Java proqramlaşdırma dilinin rəsmi loqosunda nə təsvir olunub?", opts: ["Kompüter", "Qəhvə fincanı", "Pələng", "Yarpaq"], correct: 2, award: 4000 },
+        { q: "Hansı planet 'Qırmızı planet' olaraq adlandırılır?", opts: ["Yupiter", "Saturn", "Mars", "Venera"], correct: 3, award: 8000 },
+        { q: " 'Mona Liza' əsərinin müəllifi kimdir?", opts: ["Pikasso", "Leonardo da Vinçi", "Van Qoq", "Salvador Dali"], correct: 2, award: 16000 },
+        { q: "Dünyada ən uzun çay hansıdır?", opts: ["Amazon", "Nil", "Missisipi", "Dunay"], correct: 2, award: 32000 },
+        { q: "Kimyəvi elementlərin dövri cədvəlini (periodik cədvəl) kim hazırlayıb?", opts: ["Eynşteyn", "Nyuton", "Mendeleyev", "Nobel"], correct: 3, award: 64000 },
+        { q: "ABŞ-ın ilk prezidenti kim olub?", opts: ["Avraam Linkoln", "Tomas Cefferson", "Corc Vaşinqton", "Franklin Ruzvelt"], correct: 3, award: 125000 },
+        { q: " 'Hərb və Sülh' romanının müəllifi kimdir?", opts: ["Dostoyevski", "Lev Tolstoy", "Puşkin", "Çexov"], correct: 2, award: 250000 },
+        { q: "İnsan bədənində ən böyük daxili orqan hansıdır?", opts: ["Ürək", "Ağciyər", "Qaraciyər", "Böyrək"], correct: 3, award: 500000 },
+        { q: "İşıq sürəti saniyədə təxminən neçə kilometrdir?", opts: ["150,000 km", "200,000 km", "300,000 km", "450,000 km"], correct: 3, award: 1000000 }
+    ];
+
+    let current = 0;
+    let wallet = 0;
+
+    function initLadder() {
+        const ladder = document.getElementById('prize-ladder');
+        ladder.innerHTML = '';
+        questions.forEach((q, index) => {
+            const step = document.createElement('div');
+            step.className = 'prize-step';
+            if (index === current) step.classList.add('active');
+            if (index < current) step.classList.add('completed');
+
+            // 5-ci və 10-cu suallar qarant məbləğlər kimi ağ rəngdə (rəsmi qayda)
+            if (index === 4 || index === 9 || index === 14) step.style.color = "white";
+
+            step.innerHTML = `<span>${index + 1}</span> <span>${q.award.toLocaleString()} AZN</span>`;
+            ladder.appendChild(step);
+        });
+    }
+
+    function render() {
+        const data = questions[current];
+        document.getElementById('q-text').innerText = data.q;
+        document.getElementById('prize-display').innerText = wallet.toLocaleString() + " AZN";
+        for(let i=1; i<=4; i++) {
+            document.getElementById('a'+i).innerText = data.opts[i-1];
+        }
+        initLadder();
+    }
+
+    function check(choice) {
+        if(choice === questions[current].correct) {
+            wallet = questions[current].award;
+            current++;
+            if(current < questions.length) render();
+            else alert("🏆 TƏBRİKLƏR! ARTIQ MİLYONÇUSUNUZ!");
+        } else {
+            alert("❌ Səhv! Oyun bitdi. Qazancınız: " + wallet.toLocaleString() + " AZN");
+            location.reload();
+        }
+    }
+
+    function useJoker(id) {
+        document.getElementById('j'+id).classList.add('used');
+        alert(id + " jokeri istifadə edildi!");
+    }
+
+    render();
+</script>
+</body>
+</html>

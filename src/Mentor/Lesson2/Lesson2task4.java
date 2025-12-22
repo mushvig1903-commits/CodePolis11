@@ -25,6 +25,7 @@ public class Lesson2task4 {
                 (Math.pow(1 + monthlyRate, months) - 1));
         System.out.println("Menzilin qiyməti " + housePrice + "AZN");
         System.out.println("İlkin ödənişin məbləği " + downPayment + "AZN");
+        System.out.println("Ayliq odenish: " + monthlyPayment + "AZN");
 
 
 
